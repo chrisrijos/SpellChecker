@@ -3,6 +3,8 @@
  * and recommends possible spelling solutions
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -14,7 +16,9 @@ public class SpellingChecker implements Runnable{
     /*Sets dynamic paths for spellchecker by retrieving users working directories*/
     String workingDir = System.getProperty("user.dir");//stores uses working director
     String DICT_FILENAME = "\\src\\dictionary.txt";
+    String TEST_FILENAME = "\\src\\testTextFile.txt";
     String D_PATH = workingDir + DICT_FILENAME;
+    String F_PATH = workingDir + TEST_FILENAME;
 
     public DictionaryTable DICT_MAP; //builds instance of Dictionary class as a HashTable
     char[] letters = "abcdefghijklmnopqrstuvwxyz".toCharArray();
@@ -29,20 +33,26 @@ public class SpellingChecker implements Runnable{
     @Override
     public void run() {
     /*Takes user input and prints suggestions*/
-        Scanner kb = new Scanner(System.in);
-        boolean done = false;
+        Scanner kb = null;
+
+        try {
+            kb = new Scanner(new File(F_PATH));
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         String line;
 
-        while(true) {
+        while(kb.hasNext()) {
             System.out.print("\nEnter a word to SpellCheck: ");
-            line = kb.nextLine();
+            line = kb.next();
             if (line.equals("")) {
                 break;
             }
             if (DICT_MAP.contains(line)) {
                 System.out.println("\n\t Spelling is correct for: " + line);
             } else {
-                System.out.print("Spelling for " + line + " is incorrect");
+                System.out.print("\nSpelling for " + line + " is incorrect");
                 System.out.println(suggestWords(line));
             }
         }
@@ -61,7 +71,7 @@ public class SpellingChecker implements Runnable{
         }
         return suggestWord.toString();
     }
-    private ArrayList<String> swapLetters(String line) {
+    public ArrayList<String> swapLetters(String line) {
     /*Uses foreach loop to swap first and last letters of lined passed in*/
         ArrayList<String> swappedWord = new ArrayList();
         for(char character : letters){ //iterates over character array to swap letters
@@ -76,7 +86,7 @@ public class SpellingChecker implements Runnable{
         }
         return swappedWord;
     }
-    private ArrayList<String> letterMissing(String line) {
+    public ArrayList<String> letterMissing(String line) {
         ArrayList<String> charToReturn = new ArrayList();
         int len = line.length() - 1;
         //try removing char from the front
