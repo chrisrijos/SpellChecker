@@ -1,34 +1,40 @@
 /**
- * Created by Rijos on 10/26/2015.
+ * @author: ChrisRIjos
  */
 import java.io.*;
 
 public class DictionaryTable {
 
     public String workingDir = System.getProperty("user.dir");//stores uses working director
-    public String DICT_FILENAME = "\\src\\dictionary.txt";
+    public String DICT_FILENAME = "\\src\\Dictionary.txt";
     public String D_PATH = workingDir + DICT_FILENAME;
 
-    private int DICT_SIZE; //determines size of dictionary
+    private int initLoadFactor; //determines size of dictionary by dividing count of file by 75%
     final private Bucket[] array;
 
     public DictionaryTable() {
-        setTableLoad(); //sets default table load to 50% initial load
+        setTableLoad(); //sets tables
 
-        array = new Bucket[DICT_SIZE];
-        for (int i = 0; i < DICT_SIZE; i++) {
+        array = new Bucket[initLoadFactor];
+        for (int i = 0; i < initLoadFactor; i++) {
             array[i] = new Bucket();
         }
     }
-    private void setTableLoad(){
+    protected int getTableLoad(){
+    /*Returns initial table load*/
+        return initLoadFactor;
+    }
+    protected void setTableLoad(){
+    /*Sets table initial load*/
         try {
-            DICT_SIZE = countLines(D_PATH);
+            initLoadFactor = countLines(D_PATH) % 31; //sets initial loadfactor to the remainder of the count of lines mod 31
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     private int hash(String key) {
-        return (key.hashCode() & 0x7fffffff) % DICT_SIZE;
+    /*Hash function hashes key and forces the return of a positive integer*/
+        return (key.hashCode() & 0x7fffffff) % initLoadFactor;
     }
     public static int countLines(String filename) throws IOException {
         InputStream is = new BufferedInputStream(new FileInputStream(filename));
@@ -52,18 +58,21 @@ public class DictionaryTable {
     }
     //call hash() to decide which bucket to put it in, do it.
     public void add(String key) {
+    /*hashes key and puts into hash table*/
         array[hash(key)].put(key);
     }
 
     //call hash() to find what bucket it's in, get it from that bucket.
     public boolean contains(String input) {
+    /*Checks to see if input matches */
         input = input.toLowerCase();
         return array[hash(input)].get(input);
     }
 
-    public void build(String filePath) {
+    public void build(String file) {
+    /*Builds filepath for DICTIONARY TABLE */
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = reader.readLine()) != null) {
                 add(line);
@@ -73,20 +82,17 @@ public class DictionaryTable {
         }
 
     }
+    public Double bucketUsagePercentage(){
+    /*Reads over hashtable to determine % of bucket usage*/
+        return 0.0;
+    }
+    public Double avgChainLength(){
+    /*Determines the average length of the chain*/
+        return 0.0;
+    }
 
-    //this method is used in my unit tests
-    public String[] getRandomEntries(int num) {
-        String[] toRet = new String[num];
-        for (int i = 0; i < num; i++) {
-            //pick a random bucket, go out a random number
-            Node n = array[(int) Math.random() * DICT_SIZE].first;
-            int rand = (int) Math.random() * (int) Math.sqrt(num);
-
-            for (int j = 0; j < rand && n.next != null; j++) n = n.next;
-            toRet[i] = n.word;
-
-
-        }
-        return toRet;
+    public void printStats(){
+    /*Displays Stats for Avg Chain link, % of buckets full, Max chain length*/
+        System.out.println("LoadFactor: " + getTableLoad());
     }
 }
