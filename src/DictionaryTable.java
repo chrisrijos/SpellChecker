@@ -8,15 +8,20 @@ public class DictionaryTable {
     public String workingDir = System.getProperty("user.dir");//stores uses working director
 
     public String DICT_FILENAME = "\\src\\Dictionary.txt";
-    public String TEST_FILENAME = "\\src\\testTextFile.txt";
     public String D_PATH = workingDir + DICT_FILENAME;
+    public String REPORT_FILE = "\\src\\Report.txt";
+    public String R_PATH = workingDir + REPORT_FILE;
 
     //loads buckets and LoadFactor
     private int initLoadFactor;
     final private Bucket[] array;
 
     public DictionaryTable() {
-        setTableLoad(); //sets tables
+        try {
+            initLoadFactor = (countLines(D_PATH) % 31); //sets load factor to the count of the dictionary % 31
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         array = new Bucket[initLoadFactor];
         for (int i = 0; i < initLoadFactor; i++) {
@@ -26,14 +31,6 @@ public class DictionaryTable {
     protected int getTableLoad(){
     /*Returns initial table load*/
         return initLoadFactor;
-    }
-    protected void setTableLoad(){
-    /*Sets table initial load*/
-        try {
-            initLoadFactor = countLines(D_PATH) % 31; //sets initial loadfactor to the remainder of the count of lines mod 31
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
     private int hash(String key) {
     /*Hash function hashes key and forces the return of a positive integer*/
@@ -59,19 +56,15 @@ public class DictionaryTable {
             is.close();
         }
     }
-    //call hash() to decide which bucket to put it in, do it.
     public void add(String key) {
     /*hashes key and puts into hash table*/
         array[hash(key)].put(key);
     }
-
-    //call hash() to find what bucket it's in, get it from that bucket.
     public boolean contains(String input) {
     /*Checks to see if input matches */
         input = input.toLowerCase();
         return array[hash(input)].get(input);
     }
-
     public void build(String file) {
     /*Builds filepath for DICTIONARY TABLE */
         try {
@@ -85,17 +78,52 @@ public class DictionaryTable {
         }
 
     }
-    public Double bucketUsagePercentage(){
+
+    /*Statistics*/
+    public void bucketUsagePercentage(){
     /*Reads over hashtable to determine % of bucket usage*/
-        return 0.0;
+        int buckCount = 0;
+        int x = 0;
+        int y = 0;
+        for(Bucket i : array){
+            buckCount++;
+            if(!(i.first==null)){
+                //buckets in use
+                x++;
+            }
+            if(i.first==null){
+                //buckets not in use
+                y++;
+            }
+        }
+        /*Print to table*/
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(R_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+                fw.write("\n--------------Load Factor-----------------------");
+                fw.write("\n LF: " + getTableLoad());
+                fw.write("\n--------------Bucket Usage----------------------");
+                fw.write("\nTotal Number of Buckets: " + buckCount);
+                fw.write("\nBuckets In Use : " + x);
+                fw.write("\nBuckets Not in Use: " + y);
+                fw.write("\nUsage % :" + (x / buckCount) + "%");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        try {
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public Double avgChainLength(){
-    /*Determines the average length of the chain*/
-        return 0.0;
+    public void avgChainLength(){
+    }
+    public void maxChainLength(){
+
     }
 
-    public void printStats(){
-    /*Displays Stats for Avg Chain link, % of buckets full, Max chain length*/
-        System.out.println("LoadFactor: " + getTableLoad());
-    }
 }

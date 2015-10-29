@@ -1,5 +1,6 @@
 /**
- * @author Christopher
+ * @author clr45
+ * Creates bucket class to handle nodes of data within DictionaryTable
  */
 class Bucket {
 

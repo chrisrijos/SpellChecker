@@ -44,7 +44,7 @@ public class SpellingChecker implements Runnable{
         String line;
 
         while(kb.hasNext()) {
-            System.out.print("\nEnter a word to SpellCheck: ");
+
             line = kb.next();
             if (line.equals("")) {
                 break;
@@ -56,18 +56,30 @@ public class SpellingChecker implements Runnable{
                 System.out.println(suggestWords(line));
             }
         }
+        //stats
+        DICT_MAP.bucketUsagePercentage();
+
     }
 
     private String suggestWords(String line) {
     /*Suggest words by integrating the swapCharacter */
         StringBuilder suggestWord = new StringBuilder();
-        ArrayList<String> listOfSuggested = swapLetters(line);
-        if(listOfSuggested.size() == 0) {
+        ArrayList<String> swapped = swapLetters(line);
+        ArrayList<String> letterMissing = letterMissing(line);
+        ArrayList<String> letterAdded = letterAdded(line);
+
+        if(swapped.size() == 0) {
             return " no suggestions can be made. \n";
         }
         suggestWord.append(" here are some suggestions: \n");
-        for(String input : listOfSuggested){
-            suggestWord.append("\n -" + input);
+        for(String l : swapped){
+            suggestWord.append("\n -" + l);
+        }
+        for(String l : letterMissing){
+            suggestWord.append("\n -" + l);
+        }
+        for(String l : letterAdded){
+            suggestWord.append("\n -" + l);
         }
         return suggestWord.toString();
     }
@@ -106,14 +118,14 @@ public class SpellingChecker implements Runnable{
         }
         return charToReturn;
     }
-    private ArrayList<String> charsSwapped(String input) {
+    public ArrayList<String> letterAdded(String line) {
         ArrayList<String> charToReturn = new ArrayList();
 
-        for (int i = 0; i < input.length() - 1; i++) {
-            String working = input.substring(0, i);// System.out.println("    0:" + working);
-            working = working + input.charAt(i + 1);  //System.out.println("    1:" + working);
-            working = working + input.charAt(i); //System.out.println("    2:" + working);
-            working = working.concat(input.substring((i + 2)));//System.out.println("    FIN:" + working);
+        for (int i = 0; i < line.length() - 1; i++) {
+            String working = line.substring(0, i);
+            working = working + line.charAt(i + 1);
+            working = working + line.charAt(i);
+            working = working.concat(line.substring((i + 2)));
             if (DICT_MAP.contains(working)) {
                 charToReturn.add(working);
             }
