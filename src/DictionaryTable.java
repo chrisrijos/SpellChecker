@@ -6,10 +6,13 @@ import java.io.*;
 public class DictionaryTable {
 
     public String workingDir = System.getProperty("user.dir");//stores uses working director
+
     public String DICT_FILENAME = "\\src\\Dictionary.txt";
+    public String TEST_FILENAME = "\\src\\testTextFile.txt";
     public String D_PATH = workingDir + DICT_FILENAME;
 
-    private int initLoadFactor; //determines size of dictionary by dividing count of file by 75%
+    //loads buckets and LoadFactor
+    private int initLoadFactor;
     final private Bucket[] array;
 
     public DictionaryTable() {
