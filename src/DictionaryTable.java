@@ -1,5 +1,7 @@
 /**
- * @author: ChrisRIjos
+ * @author: clr45
+ * Creates the hashtable by implementing a linked list of buckets which contain nodes.
+ * also controls the hashing of the hashtable and the printing of its metrics
  */
 import java.io.*;
 
@@ -80,22 +82,10 @@ public class DictionaryTable {
     }
 
     /*Statistics*/
-    public void bucketUsagePercentage(){
+    public void printStats(){
     /*Reads over hashtable to determine % of bucket usage*/
-        int buckCount = 0;
-        int x = 0;
-        int y = 0;
-        for(Bucket i : array){
-            buckCount++;
-            if(!(i.first==null)){
-                //buckets in use
-                x++;
-            }
-            if(i.first==null){
-                //buckets not in use
-                y++;
-            }
-        }
+
+        double bucketFreq = avgChainLength();
         /*Print to table*/
         FileWriter fw = null;
         try {
@@ -107,10 +97,11 @@ public class DictionaryTable {
                 fw.write("\n--------------Load Factor-----------------------");
                 fw.write("\n LF: " + getTableLoad());
                 fw.write("\n--------------Bucket Usage----------------------");
-                fw.write("\nTotal Number of Buckets: " + buckCount);
-                fw.write("\nBuckets In Use : " + x);
-                fw.write("\nBuckets Not in Use: " + y);
-                fw.write("\nUsage % :" + (x / buckCount) + "%");
+                fw.write("\nTotal Number of Buckets: " + bucketSize());
+                fw.write("\nUsage % :" + bucketUsage() + "%");
+                fw.write("\n-----------------------------------------------");
+                fw.write("\n-------------Avg Chain Length------------------");
+                fw.write("\n" + bucketFreq);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -120,10 +111,46 @@ public class DictionaryTable {
             e.printStackTrace();
         }
     }
-    public void avgChainLength(){
+    public double avgChainLength(){
+    //returns the average length of the hashtable chains
+       int buckSize = bucketSize();
+       int[] bucketFreq = new int[bucketSize()];
+       for(Bucket b : array){
+           bucketFreq[b.hashCode() % buckSize]++;
+       }
+        int count = 0;
+        for(int i : bucketFreq){
+            if(i > 0) count++;
+        }
+        return (double) array.length / count;
     }
-    public void maxChainLength(){
-
+    public double bucketUsage(){
+    //returns the percentage of the buckets used
+        int buckSize = bucketSize();
+        int[] bucketFreq = new int[buckSize];
+        for(Bucket b : array){
+            bucketFreq[b.hashCode() % buckSize]++;
+        }
+        int count = 0;
+        for(int i : bucketFreq){
+            if(i > 0) count++;
+        }
+        return (double) count / buckSize;
+    }
+    public int log2(int number){
+    // returns log 2 of number
+        if(number == 0)
+            return 0;
+        return 31 - Integer.numberOfLeadingZeros(number);
+    }
+    public int bucketSize(){
+    //returns the size of the buckets by bitshifting
+        int n = array.length;
+        int bucketSize = 2 << log2(n);
+        if(bucketSize * initLoadFactor <= n){
+            bucketSize <<= 1;
+        }
+        return bucketSize;
     }
 
 }

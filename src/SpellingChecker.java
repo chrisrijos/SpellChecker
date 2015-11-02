@@ -1,4 +1,4 @@
-/**@author: Christopher Rijos
+/**@author:clr45
  * Implements a spelling checker that builds a dictionary
  * and recommends possible spelling solutions
  */
@@ -57,7 +57,7 @@ public class SpellingChecker implements Runnable{
             }
         }
         //stats
-        DICT_MAP.bucketUsagePercentage();
+        DICT_MAP.printStats();
 
     }
 

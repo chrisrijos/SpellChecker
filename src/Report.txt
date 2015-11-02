@@ -2,7 +2,8 @@
 --------------Load Factor-----------------------
  LF: 26
 --------------Bucket Usage----------------------
-Total Number of Buckets: 26
-Buckets In Use : 26
-Buckets Not in Use: 0
-Usage % :1%
+Total Number of Buckets: 32
+Usage % :0.59375%
+-----------------------------------------------
+-------------Avg Chain Length------------------
+1.368421052631579
